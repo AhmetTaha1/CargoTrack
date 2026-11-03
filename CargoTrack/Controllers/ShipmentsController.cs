@@ -1,3 +1,4 @@
+using CargoTrack.DTOs;
 using CargoTrack.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,10 +38,15 @@ public class ShipmentsController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult Create(Shipment shipment)
+    public IActionResult Create(CreateShipmentRequest request)
     {
-        shipment.TrackingNumber = $"TR{Random.Shared.Next(100000, 999999)}";
-        shipment.Status = "Alındı";
+        var shipment = new Shipment
+        {
+            TrackingNumber = $"TR{Random.Shared.Next(100000, 999999)}",
+            SenderCity = request.SenderCity,
+            ReceiverCity = request.ReceiverCity,
+            Status = "Alındı"
+        };
 
         _shipments.Add(shipment);
 
@@ -71,14 +77,14 @@ public class ShipmentsController : ControllerBase
     [HttpDelete("{trackingNumber}")]
     public IActionResult Delete(string trackingNumber)
     {
-        var shipment=_shipments.FirstOrDefault(s=>s.TrackingNumber==trackingNumber);
+        var shipment = _shipments.FirstOrDefault(s => s.TrackingNumber == trackingNumber);
 
-        if(shipment is null)
+        if (shipment is null)
             return NotFound();
 
-        if(shipment.Status!="Alındı")
+        if (shipment.Status != "Alındı")
             return Conflict("Sadece 'Alındı' durumundaki kargolar iptal edilebilir");
-        
+
         _shipments.Remove(shipment);
 
         return NoContent();
