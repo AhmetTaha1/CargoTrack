@@ -36,6 +36,21 @@ public class ShipmentsController : ControllerBase
 
     }
 
+    [HttpPost]
+    public IActionResult Create(Shipment shipment)
+    {
+        shipment.TrackingNumber = $"TR{Random.Shared.Next(100000, 999999)}";
+        shipment.Status = "Alındı";
+
+        _shipments.Add(shipment);
+
+
+        return CreatedAtAction(
+            nameof(GetByTrackingNumber),
+            new { trackingNumber = shipment.TrackingNumber }, shipment
+        );
+    }
+
     [HttpGet("search")]
     public IActionResult Search(string city)
     {
