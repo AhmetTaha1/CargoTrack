@@ -58,7 +58,7 @@ public class ShipmentsController : ControllerBase
     }
 
     [HttpPut("{trackingNumber}")]
-    public IActionResult Update(string trackingNumber, Shipment updatedShipment)
+    public IActionResult Update(string trackingNumber, UpdateShipmentRequest request)
     {
         var shipment = _shipments.FirstOrDefault(s => s.TrackingNumber == trackingNumber);
         if (shipment is null)
@@ -67,9 +67,9 @@ public class ShipmentsController : ControllerBase
         if (shipment.Status == "Teslim Edildi")
             return Conflict("Teslim edilmiş kargo güncellenemez.");
 
-        shipment.ReceiverCity = updatedShipment.ReceiverCity;
-        shipment.SenderCity = updatedShipment.SenderCity;
-        shipment.Status = updatedShipment.Status;
+        shipment.ReceiverCity = request.ReceiverCity;
+        shipment.SenderCity = request.SenderCity;
+        shipment.Status = request.Status;
 
         return NoContent();
     }
