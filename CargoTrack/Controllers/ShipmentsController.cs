@@ -51,6 +51,25 @@ public class ShipmentsController : ControllerBase
         );
     }
 
+    [HttpPut("{trackingNumber}")]
+    public IActionResult Update(string trackingNumber, Shipment updatedShipment)
+    {
+        var shipment = _shipments.FirstOrDefault(s => s.TrackingNumber == trackingNumber);
+        if (shipment is null)
+            return NotFound();
+
+        if (shipment.Status == "Teslim Edildi")
+            return Conflict("Teslim edilmiş kargo güncellenemez.");
+
+        shipment.ReceiverCity = updatedShipment.ReceiverCity;
+        shipment.SenderCity = updatedShipment.SenderCity;
+        shipment.Status = updatedShipment.Status;
+
+        return NoContent();
+    }
+
+
+
     [HttpGet("search")]
     public IActionResult Search(string city)
     {
