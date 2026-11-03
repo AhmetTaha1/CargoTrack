@@ -36,6 +36,57 @@ public class ShipmentsController : ControllerBase
 
     }
 
+    [HttpPost]
+    public IActionResult Create(Shipment shipment)
+    {
+        shipment.TrackingNumber = $"TR{Random.Shared.Next(100000, 999999)}";
+        shipment.Status = "Alındı";
+
+        _shipments.Add(shipment);
+
+
+        return CreatedAtAction(
+            nameof(GetByTrackingNumber),
+            new { trackingNumber = shipment.TrackingNumber }, shipment
+        );
+    }
+
+    [HttpPut("{trackingNumber}")]
+    public IActionResult Update(string trackingNumber, Shipment updatedShipment)
+    {
+        var shipment = _shipments.FirstOrDefault(s => s.TrackingNumber == trackingNumber);
+        if (shipment is null)
+            return NotFound();
+
+        if (shipment.Status == "Teslim Edildi")
+            return Conflict("Teslim edilmiş kargo güncellenemez.");
+
+        shipment.ReceiverCity = updatedShipment.ReceiverCity;
+        shipment.SenderCity = updatedShipment.SenderCity;
+        shipment.Status = updatedShipment.Status;
+
+        return NoContent();
+    }
+
+    [HttpDelete("{trackingNumber}")]
+    public IActionResult Delete(string trackingNumber)
+    {
+        var shipment=_shipments.FirstOrDefault(s=>s.TrackingNumber==trackingNumber);
+
+        if(shipment is null)
+            return NotFound();
+
+        if(shipment.Status!="Alındı")
+            return Conflict("Sadece 'Alındı' durumundaki kargolar iptal edilebilir");
+        
+        _shipments.Remove(shipment);
+
+        return NoContent();
+    }
+
+
+
+
     [HttpGet("search")]
     public IActionResult Search(string city)
     {
