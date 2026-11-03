@@ -68,6 +68,23 @@ public class ShipmentsController : ControllerBase
         return NoContent();
     }
 
+    [HttpDelete("{trackingNumber}")]
+    public IActionResult Delete(string trackingNumber)
+    {
+        var shipment=_shipments.FirstOrDefault(s=>s.TrackingNumber==trackingNumber);
+
+        if(shipment is null)
+            return NotFound();
+
+        if(shipment.Status!="Alındı")
+            return Conflict("Sadece 'Alındı' durumundaki kargolar iptal edilebilir");
+        
+        _shipments.Remove(shipment);
+
+        return NoContent();
+    }
+
+
 
 
     [HttpGet("search")]
