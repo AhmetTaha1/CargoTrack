@@ -1,4 +1,4 @@
-namespace CargoTrack.Models;
+namespace CargoTrack.Entities;
 
 public class Shipment
 {

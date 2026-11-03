@@ -1,4 +1,4 @@
-using CargoTrack.Models;
+using CargoTrack.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CargoTrack.Controllers;
