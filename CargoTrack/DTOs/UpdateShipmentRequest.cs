@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using CargoTrack.Entities;
 
 
 namespace CargoTrack.DTOs;
@@ -14,7 +15,6 @@ public class UpdateShipmentRequest
     public string ReceiverCity { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Lütfen durum bilgisini giriniz")]
-    [StringLength(50, MinimumLength = 2, ErrorMessage = "Bu alan 2 ile 50 karakter arasında olmalıdır.")]
-    public string Status { get; set; } = string.Empty;
+    public ShipmentStatus? Status { get; set; } 
 
 }
