@@ -1,5 +1,7 @@
 using Scalar.AspNetCore;
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using CargoTrack.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
@@ -8,7 +10,8 @@ builder.Services.AddControllers()
 
 
 
-// Add services to the container.
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
 builder.Services.AddOpenApi();

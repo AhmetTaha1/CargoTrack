@@ -17,7 +17,7 @@ A cargo tracking REST API built with ASP.NET Core.
 ### Business Rules
 
 - The tracking number and initial status are always assigned by the server; clients cannot send them (request DTOs).
-- The tracking number never changes after creation.
+- The tracking number never changes after creation and is unique (enforced by a unique database index).
 - Status follows a fixed lifecycle: `Received` → `InTransit` → `OutForDelivery` → `Delivered`
 - Status can only move forward; going back or setting the same status → `409 Conflict`. Skipping steps is allowed (e.g. a courier marks a shipment `Delivered` directly).
 - Status can only be changed via `PATCH .../status`, so the lifecycle rule cannot be bypassed.
@@ -29,11 +29,12 @@ A cargo tracking REST API built with ASP.NET Core.
 
 **Current**
 - .NET 10 / ASP.NET Core Web API (controller-based)
+- Entity Framework Core 10 (code-first, migrations)
+- PostgreSQL
 - OpenAPI document generation
 - Scalar API reference UI
 
 **Planned**
-- Entity Framework Core + PostgreSQL
 - JWT authentication and role-based authorization
 - Redis, RabbitMQ, SignalR
 - React frontend
@@ -53,11 +54,17 @@ A cargo tracking REST API built with ASP.NET Core.
 
 ## Getting Started
 
-**Prerequisites:** [.NET 10 SDK](https://dotnet.microsoft.com/download)
+**Prerequisites:** [.NET 10 SDK](https://dotnet.microsoft.com/download), [PostgreSQL](https://www.postgresql.org/download/), and the EF Core CLI (`dotnet tool install --global dotnet-ef`)
 
 ```bash
 git clone https://github.com/AhmetTaha1/CargoTrack.git
 cd CargoTrack
+```
+
+Set your database connection in `CargoTrack/appsettings.Development.json` (`ConnectionStrings:DefaultConnection`), then create the database and run the API:
+
+```bash
+dotnet ef database update --project CargoTrack
 dotnet run --project CargoTrack
 ```
 
@@ -71,7 +78,7 @@ The API runs at `http://localhost:5009`. In the Development environment:
 - [x] Shipment query endpoints (list, get by tracking number, search)
 - [x] Create, update and delete shipments with proper HTTP status codes
 - [x] DTOs and request validation
-- [ ] Persistence with Entity Framework Core and PostgreSQL
+- [x] Persistence with Entity Framework Core and PostgreSQL
 - [ ] Service layer and layered architecture
 - [ ] Global error handling and logging
 - [ ] JWT authentication with roles (Customer, Courier, Branch Manager, Admin)

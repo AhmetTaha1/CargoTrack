@@ -1,6 +1,8 @@
+using CargoTrack.Data;
 using CargoTrack.DTOs;
 using CargoTrack.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CargoTrack.Controllers;
 
@@ -8,27 +10,23 @@ namespace CargoTrack.Controllers;
 [Route("api/shipments")]
 public class ShipmentsController : ControllerBase
 {
-
-    private static readonly List<Shipment> _shipments =
-    [
-        new Shipment {TrackingNumber="21312",SenderCity="Istanbul",ReceiverCity="Ankara",Status=ShipmentStatus.InTransit},
-        new Shipment {TrackingNumber="31423",SenderCity="Ankara",ReceiverCity="Izmir",Status=ShipmentStatus.Delivered},
-        new Shipment {TrackingNumber="12343",SenderCity="Istanbul",ReceiverCity="Manisa",Status=ShipmentStatus.Received},
-
-
-    ];
+    private readonly AppDbContext _context;
+    public ShipmentsController(AppDbContext context)
+    {
+        _context = context;
+    }
 
 
     [HttpGet]
     public IActionResult GetAll()
     {
-        return Ok(_shipments);
+        return Ok(_context.Shipments.ToList());
     }
 
     [HttpGet("{trackingNumber}")]
     public IActionResult GetByTrackingNumber(string trackingNumber)
     {
-        var shipment = _shipments.FirstOrDefault(s => s.TrackingNumber == trackingNumber);
+        var shipment = _context.Shipments.FirstOrDefault(s => s.TrackingNumber == trackingNumber);
 
         if (shipment is null)
             return NotFound();
@@ -40,15 +38,22 @@ public class ShipmentsController : ControllerBase
     [HttpPost]
     public IActionResult Create(CreateShipmentRequest request)
     {
+        string trackingNumber;
+        do
+        {
+            trackingNumber = $"TR{Random.Shared.Next(100000, 999999)}";
+        } while (_context.Shipments.Any(s => s.TrackingNumber == trackingNumber));
+
         var shipment = new Shipment
         {
-            TrackingNumber = $"TR{Random.Shared.Next(100000, 999999)}",
+            TrackingNumber = trackingNumber,
             SenderCity = request.SenderCity,
             ReceiverCity = request.ReceiverCity,
-            Status=ShipmentStatus.Received
+            Status = ShipmentStatus.Received
         };
 
-        _shipments.Add(shipment);
+        _context.Shipments.Add(shipment);
+        _context.SaveChanges();
 
 
         return CreatedAtAction(
@@ -60,7 +65,7 @@ public class ShipmentsController : ControllerBase
     [HttpPut("{trackingNumber}")]
     public IActionResult Update(string trackingNumber, UpdateShipmentRequest request)
     {
-        var shipment = _shipments.FirstOrDefault(s => s.TrackingNumber == trackingNumber);
+        var shipment = _context.Shipments.FirstOrDefault(s => s.TrackingNumber == trackingNumber);
         if (shipment is null)
             return NotFound();
 
@@ -69,14 +74,14 @@ public class ShipmentsController : ControllerBase
 
         shipment.ReceiverCity = request.ReceiverCity;
         shipment.SenderCity = request.SenderCity;
-
+        _context.SaveChanges();
         return NoContent();
     }
 
     [HttpDelete("{trackingNumber}")]
     public IActionResult Delete(string trackingNumber)
     {
-        var shipment = _shipments.FirstOrDefault(s => s.TrackingNumber == trackingNumber);
+        var shipment = _context.Shipments.FirstOrDefault(s => s.TrackingNumber == trackingNumber);
 
         if (shipment is null)
             return NotFound();
@@ -84,24 +89,26 @@ public class ShipmentsController : ControllerBase
         if (shipment.Status != ShipmentStatus.Received)
             return Conflict("Sadece 'Alındı' durumundaki kargolar iptal edilebilir");
 
-        _shipments.Remove(shipment);
+        _context.Shipments.Remove(shipment);
+        _context.SaveChanges();
 
         return NoContent();
     }
 
     [HttpPatch("{trackingNumber}/status")]
-    public IActionResult UpdateStatus(string trackingNumber,UpdateShipmentStatusRequest request)
+    public IActionResult UpdateStatus(string trackingNumber, UpdateShipmentStatusRequest request)
     {
-        var shipment=_shipments.FirstOrDefault(s=>s.TrackingNumber==trackingNumber);
-        if(shipment is null)
+        var shipment = _context.Shipments.FirstOrDefault(s => s.TrackingNumber == trackingNumber);
+        if (shipment is null)
             return NotFound();
 
-        var newStatus=request.Status!.Value;
+        var newStatus = request.Status!.Value;
 
-        if(newStatus<= shipment.Status)
+        if (newStatus <= shipment.Status)
             return Conflict($"Durum {shipment.Status} → {newStatus} olarak değiştirilemez. Sadece ileri gidilebilir.");
 
-        shipment.Status=newStatus;
+        shipment.Status = newStatus;
+        _context.SaveChanges();
         return NoContent();
 
 
@@ -113,7 +120,7 @@ public class ShipmentsController : ControllerBase
     [HttpGet("search")]
     public IActionResult Search(string city)
     {
-        var result = _shipments.Where(s => string.Equals(s.ReceiverCity, city, StringComparison.OrdinalIgnoreCase)).ToList();
+        var result = _context.Shipments.Where(s => EF.Functions.ILike(s.ReceiverCity, city)).ToList();
 
         return Ok(result);
     }
