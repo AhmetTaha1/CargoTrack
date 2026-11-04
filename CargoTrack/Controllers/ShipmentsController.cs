@@ -69,7 +69,6 @@ public class ShipmentsController : ControllerBase
 
         shipment.ReceiverCity = request.ReceiverCity;
         shipment.SenderCity = request.SenderCity;
-        shipment.Status = request.Status!.Value;
 
         return NoContent();
     }
@@ -88,6 +87,24 @@ public class ShipmentsController : ControllerBase
         _shipments.Remove(shipment);
 
         return NoContent();
+    }
+
+    [HttpPatch("{trackingNumber}/status")]
+    public IActionResult UpdateStatus(string trackingNumber,UpdateShipmentStatusRequest request)
+    {
+        var shipment=_shipments.FirstOrDefault(s=>s.TrackingNumber==trackingNumber);
+        if(shipment is null)
+            return NotFound();
+
+        var newStatus=request.Status!.Value;
+
+        if(newStatus<= shipment.Status)
+            return Conflict($"Durum {shipment.Status} → {newStatus} olarak değiştirilemez. Sadece ileri gidilebilir.");
+
+        shipment.Status=newStatus;
+        return NoContent();
+
+
     }
 
 

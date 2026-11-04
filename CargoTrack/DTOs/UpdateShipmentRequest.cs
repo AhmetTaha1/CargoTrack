@@ -14,7 +14,6 @@ public class UpdateShipmentRequest
     [StringLength(50, MinimumLength = 2, ErrorMessage = "Bu alan 2 ile 50 karakter arasında olmalıdır.")]
     public string ReceiverCity { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Lütfen durum bilgisini giriniz")]
-    public ShipmentStatus? Status { get; set; } 
+   
 
 }
