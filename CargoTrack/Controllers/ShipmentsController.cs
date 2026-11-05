@@ -1,9 +1,7 @@
-using CargoTrack.Data;
 using CargoTrack.DTOs;
-using CargoTrack.Entities;
+using CargoTrack.Exceptions;
 using CargoTrack.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace CargoTrack.Controllers;
 
@@ -11,12 +9,11 @@ namespace CargoTrack.Controllers;
 [Route("api/shipments")]
 public class ShipmentsController : ControllerBase
 {
-    private readonly AppDbContext _context;
     private readonly IShipmentService _shipmentService;
-    public ShipmentsController(AppDbContext context,IShipmentService shipmentService)
+    public ShipmentsController( IShipmentService shipmentService)
     {
-        _context = context;
-        _shipmentService=shipmentService;
+        
+        _shipmentService = shipmentService;
     }
 
 
@@ -29,7 +26,7 @@ public class ShipmentsController : ControllerBase
     [HttpGet("{trackingNumber}")]
     public IActionResult GetByTrackingNumber(string trackingNumber)
     {
-        var shipment=_shipmentService.GetByTrackingNumber(trackingNumber);
+        var shipment = _shipmentService.GetByTrackingNumber(trackingNumber);
 
         if (shipment is null)
             return NotFound();
@@ -41,8 +38,8 @@ public class ShipmentsController : ControllerBase
     [HttpPost]
     public IActionResult Create(CreateShipmentRequest request)
     {
-       
-       var shipment=_shipmentService.Create(request);
+
+        var shipment = _shipmentService.Create(request);
 
         return CreatedAtAction(
             nameof(GetByTrackingNumber),
@@ -53,56 +50,55 @@ public class ShipmentsController : ControllerBase
     [HttpPut("{trackingNumber}")]
     public IActionResult Update(string trackingNumber, UpdateShipmentRequest request)
     {
-        var shipment = _context.Shipments.FirstOrDefault(s => s.TrackingNumber == trackingNumber);
-        if (shipment is null)
-            return NotFound();
-
-        if (shipment.Status == ShipmentStatus.Delivered)
-            return Conflict("Teslim edilmiş kargo güncellenemez.");
-
-        shipment.ReceiverCity = request.ReceiverCity;
-        shipment.SenderCity = request.SenderCity;
-        _context.SaveChanges();
-        return NoContent();
+        try
+        {
+            _shipmentService.Update(trackingNumber, request);
+            return NoContent();
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (ConflictException ex)
+        {
+            return Conflict(ex.Message);
+        }
+        
     }
 
     [HttpDelete("{trackingNumber}")]
     public IActionResult Delete(string trackingNumber)
     {
-        var shipment = _context.Shipments.FirstOrDefault(s => s.TrackingNumber == trackingNumber);
-
-        if (shipment is null)
-            return NotFound();
-
-        if (shipment.Status != ShipmentStatus.Received)
-            return Conflict("Sadece 'Alındı' durumundaki kargolar iptal edilebilir");
-
-        _context.Shipments.Remove(shipment);
-        _context.SaveChanges();
-
-        return NoContent();
+        try
+        {
+            _shipmentService.Delete(trackingNumber);
+            return NoContent();
+        }catch(NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }catch(ConflictException ex)
+        {
+            return Conflict(ex.Message);
+        }
     }
 
     [HttpPatch("{trackingNumber}/status")]
     public IActionResult UpdateStatus(string trackingNumber, UpdateShipmentStatusRequest request)
     {
-        var shipment = _context.Shipments.FirstOrDefault(s => s.TrackingNumber == trackingNumber);
-        if (shipment is null)
-            return NotFound();
-
-        var newStatus = request.Status!.Value;
-
-        if (newStatus <= shipment.Status)
-            return Conflict($"Durum {shipment.Status} → {newStatus} olarak değiştirilemez. Sadece ileri gidilebilir.");
-
-        shipment.Status = newStatus;
-        _context.SaveChanges();
-        return NoContent();
+        try
+        {
+            _shipmentService.UpdateStatus(trackingNumber,request);
+            return NoContent();
+        }catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }catch (ConflictException ex)
+        {
+            return Conflict(ex.Message);
+        }
 
 
     }
-
-
 
 
     [HttpGet("search")]

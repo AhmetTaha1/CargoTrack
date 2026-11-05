@@ -11,6 +11,10 @@ public interface IShipmentService
     Shipment Create(CreateShipmentRequest request);
     List<Shipment> Search(string city);
 
+    void Update(string trackingNumber,UpdateShipmentRequest request);
+    void UpdateStatus(string trackingNumber,UpdateShipmentStatusRequest request);
+    void Delete(string trackingNumber);
+
 
 
 
