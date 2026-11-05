@@ -1,6 +1,7 @@
 using CargoTrack.Data;
 using CargoTrack.DTOs;
 using CargoTrack.Entities;
+using CargoTrack.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,22 +12,24 @@ namespace CargoTrack.Controllers;
 public class ShipmentsController : ControllerBase
 {
     private readonly AppDbContext _context;
-    public ShipmentsController(AppDbContext context)
+    private readonly IShipmentService _shipmentService;
+    public ShipmentsController(AppDbContext context,IShipmentService shipmentService)
     {
         _context = context;
+        _shipmentService=shipmentService;
     }
 
 
     [HttpGet]
     public IActionResult GetAll()
     {
-        return Ok(_context.Shipments.ToList());
+        return Ok(_shipmentService.GetAll());
     }
 
     [HttpGet("{trackingNumber}")]
     public IActionResult GetByTrackingNumber(string trackingNumber)
     {
-        var shipment = _context.Shipments.FirstOrDefault(s => s.TrackingNumber == trackingNumber);
+        var shipment=_shipmentService.GetByTrackingNumber(trackingNumber);
 
         if (shipment is null)
             return NotFound();
@@ -38,23 +41,8 @@ public class ShipmentsController : ControllerBase
     [HttpPost]
     public IActionResult Create(CreateShipmentRequest request)
     {
-        string trackingNumber;
-        do
-        {
-            trackingNumber = $"TR{Random.Shared.Next(100000, 999999)}";
-        } while (_context.Shipments.Any(s => s.TrackingNumber == trackingNumber));
-
-        var shipment = new Shipment
-        {
-            TrackingNumber = trackingNumber,
-            SenderCity = request.SenderCity,
-            ReceiverCity = request.ReceiverCity,
-            Status = ShipmentStatus.Received
-        };
-
-        _context.Shipments.Add(shipment);
-        _context.SaveChanges();
-
+       
+       var shipment=_shipmentService.Create(request);
 
         return CreatedAtAction(
             nameof(GetByTrackingNumber),
@@ -120,9 +108,8 @@ public class ShipmentsController : ControllerBase
     [HttpGet("search")]
     public IActionResult Search(string city)
     {
-        var result = _context.Shipments.Where(s => EF.Functions.ILike(s.ReceiverCity, city)).ToList();
 
-        return Ok(result);
+        return Ok(_shipmentService.Search(city));
     }
 
 

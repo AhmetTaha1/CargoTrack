@@ -2,6 +2,7 @@ using Scalar.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using CargoTrack.Data;
+using CargoTrack.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
@@ -15,6 +16,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 
 builder.Services.AddOpenApi();
+builder.Services.AddScoped<IShipmentService, ShipmentService>();
 
 var app = builder.Build();
 
