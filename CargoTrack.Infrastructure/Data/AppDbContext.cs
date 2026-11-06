@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using CargoTrack.Domain.Entities;
 
-namespace CargoTrack.Data;
+namespace CargoTrack.Infrastructure.Data;
 
 
 public class AppDbContext : DbContext

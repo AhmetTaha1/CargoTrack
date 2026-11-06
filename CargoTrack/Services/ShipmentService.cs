@@ -1,29 +1,30 @@
-using Microsoft.EntityFrameworkCore;
-using CargoTrack.Data;
+
 using CargoTrack.Application.DTOs;
 using CargoTrack.Domain.Entities;
 using CargoTrack.Application.Exceptions;
+using CargoTrack.Application.Interfaces;
+
 
 namespace CargoTrack.Services;
 
 public class ShipmentService : IShipmentService
 {
 
-    private readonly AppDbContext _context;
+    private readonly IShipmentRepository _repository;
 
-    public ShipmentService(AppDbContext context)
+    public ShipmentService(IShipmentRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
     public List<Shipment> GetAll()
     {
-        return _context.Shipments.ToList();
+       return _repository.GetAll();
     }
 
     public Shipment? GetByTrackingNumber(string trackingNumber)
     {
-        return _context.Shipments.FirstOrDefault(s => s.TrackingNumber == trackingNumber);
+       return _repository.GetByTrackingNumber(trackingNumber);
     }
 
     public Shipment Create(CreateShipmentRequest request)
@@ -32,7 +33,7 @@ public class ShipmentService : IShipmentService
         do
         {
             trackingNumber = $"TR{Random.Shared.Next(100000, 999999)}";
-        } while (_context.Shipments.Any(s => s.TrackingNumber == trackingNumber));
+        } while (_repository.TrackingNumberExists(trackingNumber));
 
         var shipment = new Shipment
         {
@@ -42,8 +43,8 @@ public class ShipmentService : IShipmentService
             Status = ShipmentStatus.Received
         };
 
-        _context.Shipments.Add(shipment);
-        _context.SaveChanges();
+        _repository.Add(shipment);
+        _repository.SaveChanges();
 
 
         return shipment;
@@ -52,13 +53,13 @@ public class ShipmentService : IShipmentService
 
     public List<Shipment> Search(string city)
     {
-        return _context.Shipments.Where(s => EF.Functions.ILike(s.ReceiverCity, city)).ToList();
+        return _repository.Search(city);
     }
 
     public void Update(string trackingNumber, UpdateShipmentRequest request)
     {
 
-        var shipment = _context.Shipments.FirstOrDefault(s => s.TrackingNumber == trackingNumber);
+        var shipment = _repository.GetByTrackingNumber(trackingNumber);
 
         if (shipment is null)
             throw new NotFoundException("Kargo bulunamadı");
@@ -68,14 +69,14 @@ public class ShipmentService : IShipmentService
 
         shipment.ReceiverCity = request.ReceiverCity;
         shipment.SenderCity = request.SenderCity;
-        _context.SaveChanges();
+        _repository.SaveChanges();
 
     }
 
     public void UpdateStatus(string trackingNumber, UpdateShipmentStatusRequest request)
     {
 
-        var shipment = _context.Shipments.FirstOrDefault(s => s.TrackingNumber == trackingNumber);
+        var shipment = _repository.GetByTrackingNumber(trackingNumber);
 
         if (shipment is null)
             throw new NotFoundException("Kargo bulunamadı");
@@ -86,13 +87,13 @@ public class ShipmentService : IShipmentService
         if (newStatus <= shipment.Status)
             throw new ConflictException($"Durum {shipment.Status} → {newStatus} olarak değiştirilemez. Sadece ileri gidilebilir.");
         shipment.Status = newStatus;
-        _context.SaveChanges();
+        _repository.SaveChanges();
 
     }
 
     public void Delete(string trackingNumber)
     {
-        var shipment=_context.Shipments.FirstOrDefault(s=>s.TrackingNumber==trackingNumber);
+        var shipment=_repository.GetByTrackingNumber(trackingNumber);
 
         if(shipment is null)
             throw new NotFoundException("Kargo bulunamadı");
@@ -100,8 +101,8 @@ public class ShipmentService : IShipmentService
         if(shipment.Status!=ShipmentStatus.Received)
             throw new ConflictException("Sadece 'Alındı' durumundaki kargolar iptal edilebilir");
         
-        _context.Shipments.Remove(shipment);
-        _context.SaveChanges();
+        _repository.Remove(shipment);
+        _repository.SaveChanges();
 
         
     }
