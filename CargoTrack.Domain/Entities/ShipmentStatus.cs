@@ -1,4 +1,4 @@
-namespace CargoTrack.Entities;
+namespace CargoTrack.Domain.Entities;
 
 public enum ShipmentStatus
 {

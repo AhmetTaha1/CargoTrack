@@ -1,4 +1,4 @@
-using CargoTrack.Entities;
+using CargoTrack.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 
 

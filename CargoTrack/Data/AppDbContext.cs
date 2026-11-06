@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using CargoTrack.Entities;
+using CargoTrack.Domain.Entities;
 
 namespace CargoTrack.Data;
 

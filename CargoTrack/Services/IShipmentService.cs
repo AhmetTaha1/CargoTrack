@@ -1,5 +1,5 @@
 using CargoTrack.DTOs;
-using CargoTrack.Entities;
+using CargoTrack.Domain.Entities;
 
 namespace CargoTrack.Services;
 

@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using CargoTrack.Entities;
+using CargoTrack.Domain.Entities;
 
 
 namespace CargoTrack.DTOs;
