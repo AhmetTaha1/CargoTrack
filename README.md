@@ -29,6 +29,7 @@ A cargo tracking REST API built with ASP.NET Core.
 
 **Current**
 - .NET 10 / ASP.NET Core Web API (controller-based)
+- Clean Architecture (Domain / Application / Infrastructure / API), service layer, repository pattern, dependency injection
 - Entity Framework Core 10 (code-first, migrations)
 - PostgreSQL
 - OpenAPI document generation
@@ -39,6 +40,17 @@ A cargo tracking REST API built with ASP.NET Core.
 - Redis, RabbitMQ, SignalR
 - React frontend
 - Docker / Docker Compose
+
+## Project Structure
+
+```
+CargoTrack.Domain           Entities and enums (Shipment, ShipmentStatus). No dependencies.
+CargoTrack.Application      Business logic: services, DTOs, exceptions, repository interfaces
+CargoTrack.Infrastructure   Data access: EF Core DbContext, migrations, repository implementations
+CargoTrack                  ASP.NET Core API: controllers, DI setup (Program.cs), configuration
+```
+
+Dependencies point inward: `API → Application → Domain`, `Infrastructure → Application`. The Application layer never references EF Core or PostgreSQL directly; it depends on repository interfaces that Infrastructure implements.
 
 ## API Endpoints
 
@@ -64,7 +76,7 @@ cd CargoTrack
 Set your database connection in `CargoTrack/appsettings.Development.json` (`ConnectionStrings:DefaultConnection`), then create the database and run the API:
 
 ```bash
-dotnet ef database update --project CargoTrack
+dotnet ef database update --project CargoTrack.Infrastructure --startup-project CargoTrack
 dotnet run --project CargoTrack
 ```
 
@@ -79,7 +91,7 @@ The API runs at `http://localhost:5009`. In the Development environment:
 - [x] Create, update and delete shipments with proper HTTP status codes
 - [x] DTOs and request validation
 - [x] Persistence with Entity Framework Core and PostgreSQL
-- [ ] Service layer and layered architecture
+- [x] Service layer and Clean Architecture (layered projects, repository pattern)
 - [ ] Global error handling and logging
 - [ ] JWT authentication with roles (Customer, Courier, Branch Manager, Admin)
 - [x] Shipment status workflow with business rules
