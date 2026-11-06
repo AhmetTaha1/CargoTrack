@@ -1,8 +1,8 @@
-using CargoTrack.Entities;
+using CargoTrack.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 
 
-namespace CargoTrack.DTOs;
+namespace CargoTrack.Application.DTOs;
 
 
 public class UpdateShipmentStatusRequest

@@ -1,3 +1,6 @@
 <Solution>
+  <Project Path="CargoTrack.Application/CargoTrack.Application.csproj" />
+  <Project Path="CargoTrack.Domain/CargoTrack.Domain.csproj" />
+  <Project Path="CargoTrack.Infrastructure/CargoTrack.Infrastructure.csproj" />
   <Project Path="CargoTrack/CargoTrack.csproj" />
 </Solution>

@@ -13,8 +13,12 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.OpenApi" Version="2.7.5" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.18.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CargoTrack.Application\CargoTrack.Application.csproj" />
+    <ProjectReference Include="..\CargoTrack.Infrastructure\CargoTrack.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

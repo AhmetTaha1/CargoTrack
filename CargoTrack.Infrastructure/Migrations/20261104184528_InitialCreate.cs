@@ -3,7 +3,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace CargoTrack.Migrations
+namespace CargoTrack.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
