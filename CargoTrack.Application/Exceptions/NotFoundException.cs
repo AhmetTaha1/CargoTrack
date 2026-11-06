@@ -1,5 +1,5 @@
 
-namespace CargoTrack.Exceptions;
+namespace CargoTrack.Application.Exceptions;
 
 
 public class NotFoundException : Exception

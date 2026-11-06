@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using CargoTrack.Domain.Entities;
 
 
-namespace CargoTrack.DTOs;
+namespace CargoTrack.Application.DTOs;
 
 public class UpdateShipmentRequest
 {

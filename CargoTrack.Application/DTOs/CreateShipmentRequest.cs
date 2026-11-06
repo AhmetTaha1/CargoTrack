@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace CargoTrack.DTOs;
+namespace CargoTrack.Application.DTOs;
 
 public class CreateShipmentRequest
 {

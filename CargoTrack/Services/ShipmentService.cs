@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using CargoTrack.Data;
-using CargoTrack.DTOs;
+using CargoTrack.Application.DTOs;
 using CargoTrack.Domain.Entities;
-using CargoTrack.Exceptions;
+using CargoTrack.Application.Exceptions;
 
 namespace CargoTrack.Services;
 

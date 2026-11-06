@@ -1,5 +1,5 @@
-using CargoTrack.DTOs;
-using CargoTrack.Exceptions;
+using CargoTrack.Application.DTOs;
+using CargoTrack.Application.Exceptions;
 using CargoTrack.Services;
 using Microsoft.AspNetCore.Mvc;
 

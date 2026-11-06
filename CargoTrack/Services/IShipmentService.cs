@@ -1,4 +1,4 @@
-using CargoTrack.DTOs;
+using CargoTrack.Application.DTOs;
 using CargoTrack.Domain.Entities;
 
 namespace CargoTrack.Services;
