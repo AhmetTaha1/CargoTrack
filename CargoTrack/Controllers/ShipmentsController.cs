@@ -1,6 +1,6 @@
 using CargoTrack.Application.DTOs;
 using CargoTrack.Application.Exceptions;
-using CargoTrack.Services;
+using CargoTrack.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CargoTrack.Controllers;

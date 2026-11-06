@@ -2,7 +2,7 @@ using Scalar.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using CargoTrack.Infrastructure.Data;
-using CargoTrack.Services;
+using CargoTrack.Application.Services;
 using CargoTrack.Application.Interfaces;
 using CargoTrack.Infrastructure.Repositories;
 

@@ -5,7 +5,7 @@ using CargoTrack.Application.Exceptions;
 using CargoTrack.Application.Interfaces;
 
 
-namespace CargoTrack.Services;
+namespace CargoTrack.Application.Services;
 
 public class ShipmentService : IShipmentService
 {

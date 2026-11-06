@@ -1,7 +1,7 @@
 using CargoTrack.Application.DTOs;
 using CargoTrack.Domain.Entities;
 
-namespace CargoTrack.Services;
+namespace CargoTrack.Application.Services;
 
 public interface IShipmentService
 {
