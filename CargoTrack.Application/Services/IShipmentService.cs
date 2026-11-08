@@ -6,14 +6,14 @@ namespace CargoTrack.Application.Services;
 public interface IShipmentService
 {
     
-    List<Shipment> GetAll();
-    Shipment? GetByTrackingNumber(string trackingNumber);
-    Shipment Create(CreateShipmentRequest request);
-    List<Shipment> Search(string city);
+    Task<List<Shipment>> GetAllAsync();
+    Task<Shipment?> GetByTrackingNumberAsync(string trackingNumber);
+    Task<Shipment> CreateAsync(CreateShipmentRequest request);
+    Task<List<Shipment>> SearchAsync(string city);
 
-    void Update(string trackingNumber,UpdateShipmentRequest request);
-    void UpdateStatus(string trackingNumber,UpdateShipmentStatusRequest request);
-    void Delete(string trackingNumber);
+    Task UpdateAsync(string trackingNumber,UpdateShipmentRequest request);
+    Task UpdateStatusAsync(string trackingNumber,UpdateShipmentStatusRequest request);
+    Task DeleteAsync(string trackingNumber);
 
 
 

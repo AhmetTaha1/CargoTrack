@@ -10,23 +10,23 @@ namespace CargoTrack.Controllers;
 public class ShipmentsController : ControllerBase
 {
     private readonly IShipmentService _shipmentService;
-    public ShipmentsController( IShipmentService shipmentService)
+    public ShipmentsController(IShipmentService shipmentService)
     {
-        
+
         _shipmentService = shipmentService;
     }
 
 
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        return Ok(_shipmentService.GetAll());
+        return Ok(await _shipmentService.GetAllAsync());
     }
 
     [HttpGet("{trackingNumber}")]
-    public IActionResult GetByTrackingNumber(string trackingNumber)
+    public async Task<IActionResult> GetByTrackingNumber(string trackingNumber)
     {
-        var shipment = _shipmentService.GetByTrackingNumber(trackingNumber);
+        var shipment = await _shipmentService.GetByTrackingNumberAsync(trackingNumber);
 
         if (shipment is null)
             return NotFound();
@@ -36,10 +36,10 @@ public class ShipmentsController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult Create(CreateShipmentRequest request)
+    public async Task<IActionResult> Create(CreateShipmentRequest request)
     {
 
-        var shipment = _shipmentService.Create(request);
+        var shipment = await _shipmentService.CreateAsync(request);
 
         return CreatedAtAction(
             nameof(GetByTrackingNumber),
@@ -48,11 +48,11 @@ public class ShipmentsController : ControllerBase
     }
 
     [HttpPut("{trackingNumber}")]
-    public IActionResult Update(string trackingNumber, UpdateShipmentRequest request)
+    public async Task<IActionResult> Update(string trackingNumber, UpdateShipmentRequest request)
     {
         try
         {
-            _shipmentService.Update(trackingNumber, request);
+            await _shipmentService.UpdateAsync(trackingNumber, request);
             return NoContent();
         }
         catch (NotFoundException ex)
@@ -63,36 +63,40 @@ public class ShipmentsController : ControllerBase
         {
             return Conflict(ex.Message);
         }
-        
+
     }
 
     [HttpDelete("{trackingNumber}")]
-    public IActionResult Delete(string trackingNumber)
+    public async Task<IActionResult> Delete(string trackingNumber)
     {
         try
         {
-            _shipmentService.Delete(trackingNumber);
+            await _shipmentService.DeleteAsync(trackingNumber);
             return NoContent();
-        }catch(NotFoundException ex)
+        }
+        catch (NotFoundException ex)
         {
             return NotFound(ex.Message);
-        }catch(ConflictException ex)
+        }
+        catch (ConflictException ex)
         {
             return Conflict(ex.Message);
         }
     }
 
     [HttpPatch("{trackingNumber}/status")]
-    public IActionResult UpdateStatus(string trackingNumber, UpdateShipmentStatusRequest request)
+    public async Task<IActionResult> UpdateStatus(string trackingNumber, UpdateShipmentStatusRequest request)
     {
         try
         {
-            _shipmentService.UpdateStatus(trackingNumber,request);
+            await _shipmentService.UpdateStatusAsync(trackingNumber, request);
             return NoContent();
-        }catch (NotFoundException ex)
+        }
+        catch (NotFoundException ex)
         {
             return NotFound(ex.Message);
-        }catch (ConflictException ex)
+        }
+        catch (ConflictException ex)
         {
             return Conflict(ex.Message);
         }
@@ -102,10 +106,10 @@ public class ShipmentsController : ControllerBase
 
 
     [HttpGet("search")]
-    public IActionResult Search(string city)
+    public async Task<IActionResult> Search(string city)
     {
 
-        return Ok(_shipmentService.Search(city));
+        return Ok(await _shipmentService.SearchAsync(city));
     }
 
 

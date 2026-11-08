@@ -14,22 +14,22 @@ public class ShipmentRepository : IShipmentRepository
         _context=context;
     }
 
-    public List<Shipment> GetAll()
+    public async Task<List<Shipment>> GetAllAsync()
     {
-        return _context.Shipments.ToList();
+        return await _context.Shipments.ToListAsync();
     }
-    public Shipment? GetByTrackingNumber(string trackingNumber)
+    public async Task<Shipment?> GetByTrackingNumberAsync(string trackingNumber)
     {
-        return _context.Shipments.FirstOrDefault(s=>s.TrackingNumber==trackingNumber);
+        return await _context.Shipments.FirstOrDefaultAsync(s=>s.TrackingNumber==trackingNumber);
     }
-    public List<Shipment> Search(string city)
+    public async Task<List<Shipment>> SearchAsync(string city)
     {
-        return _context.Shipments.Where(s=>EF.Functions.ILike(s.ReceiverCity,city)).ToList();
+        return await _context.Shipments.Where(s=>EF.Functions.ILike(s.ReceiverCity,city)).ToListAsync();
     }
 
-    public bool TrackingNumberExists(string trackingNumber)
+    public async Task<bool> TrackingNumberExistsAsync(string trackingNumber)
     {
-        return _context.Shipments.Any(s=>s.TrackingNumber==trackingNumber);
+        return await _context.Shipments.AnyAsync(s=>s.TrackingNumber==trackingNumber);
     }
 
     public void Add(Shipment shipment)
@@ -41,9 +41,9 @@ public class ShipmentRepository : IShipmentRepository
     {
         _context.Shipments.Remove(shipment);
     }
-    public void SaveChanges()
+    public async Task SaveChangesAsync()
     {
-        _context.SaveChanges();
+       await _context.SaveChangesAsync();
     }
 
 

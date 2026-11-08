@@ -17,23 +17,23 @@ public class ShipmentService : IShipmentService
         _repository = repository;
     }
 
-    public List<Shipment> GetAll()
+    public async Task<List<Shipment>> GetAllAsync()
     {
-       return _repository.GetAll();
+        return await _repository.GetAllAsync();
     }
 
-    public Shipment? GetByTrackingNumber(string trackingNumber)
+    public async Task<Shipment?> GetByTrackingNumberAsync(string trackingNumber)
     {
-       return _repository.GetByTrackingNumber(trackingNumber);
+        return await _repository.GetByTrackingNumberAsync(trackingNumber);
     }
 
-    public Shipment Create(CreateShipmentRequest request)
+    public async Task<Shipment> CreateAsync(CreateShipmentRequest request)
     {
         string trackingNumber;
         do
         {
             trackingNumber = $"TR{Random.Shared.Next(100000, 999999)}";
-        } while (_repository.TrackingNumberExists(trackingNumber));
+        } while (await _repository.TrackingNumberExistsAsync(trackingNumber));
 
         var shipment = new Shipment
         {
@@ -44,22 +44,22 @@ public class ShipmentService : IShipmentService
         };
 
         _repository.Add(shipment);
-        _repository.SaveChanges();
+        await _repository.SaveChangesAsync();
 
 
         return shipment;
 
     }
 
-    public List<Shipment> Search(string city)
+    public async Task<List<Shipment>> SearchAsync(string city)
     {
-        return _repository.Search(city);
+        return await _repository.SearchAsync(city);
     }
 
-    public void Update(string trackingNumber, UpdateShipmentRequest request)
+    public async Task UpdateAsync(string trackingNumber, UpdateShipmentRequest request)
     {
 
-        var shipment = _repository.GetByTrackingNumber(trackingNumber);
+        var shipment =await _repository.GetByTrackingNumberAsync(trackingNumber);
 
         if (shipment is null)
             throw new NotFoundException("Kargo bulunamadı");
@@ -69,14 +69,14 @@ public class ShipmentService : IShipmentService
 
         shipment.ReceiverCity = request.ReceiverCity;
         shipment.SenderCity = request.SenderCity;
-        _repository.SaveChanges();
+        await _repository.SaveChangesAsync();
 
     }
 
-    public void UpdateStatus(string trackingNumber, UpdateShipmentStatusRequest request)
+    public async Task UpdateStatusAsync(string trackingNumber, UpdateShipmentStatusRequest request)
     {
 
-        var shipment = _repository.GetByTrackingNumber(trackingNumber);
+        var shipment = await _repository.GetByTrackingNumberAsync(trackingNumber);
 
         if (shipment is null)
             throw new NotFoundException("Kargo bulunamadı");
@@ -87,24 +87,24 @@ public class ShipmentService : IShipmentService
         if (newStatus <= shipment.Status)
             throw new ConflictException($"Durum {shipment.Status} → {newStatus} olarak değiştirilemez. Sadece ileri gidilebilir.");
         shipment.Status = newStatus;
-        _repository.SaveChanges();
+        await _repository.SaveChangesAsync();
 
     }
 
-    public void Delete(string trackingNumber)
+    public async Task DeleteAsync(string trackingNumber)
     {
-        var shipment=_repository.GetByTrackingNumber(trackingNumber);
+        var shipment = await _repository.GetByTrackingNumberAsync(trackingNumber);
 
-        if(shipment is null)
+        if (shipment is null)
             throw new NotFoundException("Kargo bulunamadı");
 
-        if(shipment.Status!=ShipmentStatus.Received)
+        if (shipment.Status != ShipmentStatus.Received)
             throw new ConflictException("Sadece 'Alındı' durumundaki kargolar iptal edilebilir");
-        
-        _repository.Remove(shipment);
-        _repository.SaveChanges();
 
-        
+        _repository.Remove(shipment);
+        await _repository.SaveChangesAsync();
+
+
     }
 
 
