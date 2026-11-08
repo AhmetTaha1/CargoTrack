@@ -4,14 +4,14 @@ namespace CargoTrack.Application.Interfaces;
 
 public interface IShipmentRepository
 {
-     List<Shipment> GetAll();
-    Shipment? GetByTrackingNumber(string trackingNumber);
+     Task<List<Shipment>> GetAllAsync();
+    Task<Shipment?> GetByTrackingNumberAsync(string trackingNumber);
     
-    List<Shipment> Search(string city);
-    bool TrackingNumberExists(string trackingNumber);
+    Task<List<Shipment>> SearchAsync(string city);
+    Task<bool> TrackingNumberExistsAsync(string trackingNumber);
     void Add(Shipment shipment);
     void Remove(Shipment shipment);
-    void SaveChanges();
+    Task SaveChangesAsync();
     
 
 
