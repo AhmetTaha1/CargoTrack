@@ -30,7 +30,7 @@ A cargo tracking REST API built with ASP.NET Core.
 **Current**
 - .NET 10 / ASP.NET Core Web API (controller-based)
 - Clean Architecture (Domain / Application / Infrastructure / API), service layer, repository pattern, dependency injection
-- Entity Framework Core 10 (code-first, migrations)
+- Entity Framework Core 10 (code-first, migrations) with asynchronous database access (async/await)
 - PostgreSQL
 - OpenAPI document generation
 - Scalar API reference UI
@@ -92,6 +92,7 @@ The API runs at `http://localhost:5009`. In the Development environment:
 - [x] DTOs and request validation
 - [x] Persistence with Entity Framework Core and PostgreSQL
 - [x] Service layer and Clean Architecture (layered projects, repository pattern)
+- [x] Asynchronous request handling with async/await across all layers
 - [ ] Global error handling and logging
 - [ ] JWT authentication with roles (Customer, Courier, Branch Manager, Admin)
 - [x] Shipment status workflow with business rules
