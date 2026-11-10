@@ -12,6 +12,7 @@ public class AppDbContext : DbContext
         
     }
     public DbSet<Shipment> Shipments =>Set<Shipment>();
+    public DbSet<User> Users=>Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -24,6 +25,20 @@ public class AppDbContext : DbContext
             entity.Property(s=>s.Status).HasConversion<string>();
 
         });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasIndex(u=> u.Email).IsUnique();
+            entity.Property(u=> u.Email).HasMaxLength(100);
+            entity.Property(u=> u.Role).HasConversion<string>();
+        });
+
+
+
+
+
+
+
     }
 
 
