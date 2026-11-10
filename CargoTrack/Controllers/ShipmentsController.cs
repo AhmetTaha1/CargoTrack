@@ -50,56 +50,29 @@ public class ShipmentsController : ControllerBase
     [HttpPut("{trackingNumber}")]
     public async Task<IActionResult> Update(string trackingNumber, UpdateShipmentRequest request)
     {
-        try
-        {
-            await _shipmentService.UpdateAsync(trackingNumber, request);
-            return NoContent();
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (ConflictException ex)
-        {
-            return Conflict(ex.Message);
-        }
+
+        await _shipmentService.UpdateAsync(trackingNumber, request);
+        return NoContent();
+
 
     }
 
     [HttpDelete("{trackingNumber}")]
     public async Task<IActionResult> Delete(string trackingNumber)
     {
-        try
-        {
-            await _shipmentService.DeleteAsync(trackingNumber);
-            return NoContent();
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (ConflictException ex)
-        {
-            return Conflict(ex.Message);
-        }
+
+        await _shipmentService.DeleteAsync(trackingNumber);
+        return NoContent();
+
     }
 
     [HttpPatch("{trackingNumber}/status")]
     public async Task<IActionResult> UpdateStatus(string trackingNumber, UpdateShipmentStatusRequest request)
     {
-        try
-        {
-            await _shipmentService.UpdateStatusAsync(trackingNumber, request);
-            return NoContent();
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (ConflictException ex)
-        {
-            return Conflict(ex.Message);
-        }
+
+        await _shipmentService.UpdateStatusAsync(trackingNumber, request);
+        return NoContent();
+
 
 
     }

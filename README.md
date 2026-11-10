@@ -32,6 +32,7 @@ A cargo tracking REST API built with ASP.NET Core.
 - Clean Architecture (Domain / Application / Infrastructure / API), service layer, repository pattern, dependency injection
 - Entity Framework Core 10 (code-first, migrations) with asynchronous database access (async/await)
 - PostgreSQL
+- Global exception handling (`IExceptionHandler`) with `ProblemDetails` responses and logging (`ILogger`)
 - OpenAPI document generation
 - Scalar API reference UI
 
@@ -64,6 +65,28 @@ Dependencies point inward: `API → Application → Domain`, `Infrastructure →
 | `PATCH` | `/api/shipments/{trackingNumber}/status` | Moves the shipment forward in its lifecycle | `204 No Content`, `400 Bad Request`, `404 Not Found`, `409 Conflict` |
 | `DELETE` | `/api/shipments/{trackingNumber}` | Cancels a shipment | `204 No Content`, `404 Not Found`, `409 Conflict` |
 
+## Error Handling
+
+Business rules throw domain-level exceptions from the Application layer (`NotFoundException`, `ConflictException`). A single global exception handler in the API layer maps them to HTTP responses, so controllers contain no try/catch blocks.
+
+| Exception | Response |
+|---|---|
+| `NotFoundException` | `404 Not Found` |
+| `ConflictException` | `409 Conflict` |
+| Any other exception | `500 Internal Server Error` (logged; internal details are not returned) |
+
+Errors are returned in the standard `ProblemDetails` format:
+
+```json
+{
+  "title": "İşlem yapılamadı",
+  "status": 409,
+  "detail": "Durum InTransit → Received olarak değiştirilemez. Sadece ileri gidilebilir."
+}
+```
+
+Validation errors (`400 Bad Request`) are produced automatically by `[ApiController]` before the request reaches the controller.
+
 ## Getting Started
 
 **Prerequisites:** [.NET 10 SDK](https://dotnet.microsoft.com/download), [PostgreSQL](https://www.postgresql.org/download/), and the EF Core CLI (`dotnet tool install --global dotnet-ef`)
@@ -93,7 +116,7 @@ The API runs at `http://localhost:5009`. In the Development environment:
 - [x] Persistence with Entity Framework Core and PostgreSQL
 - [x] Service layer and Clean Architecture (layered projects, repository pattern)
 - [x] Asynchronous request handling with async/await across all layers
-- [ ] Global error handling and logging
+- [x] Global error handling and logging
 - [ ] JWT authentication with roles (Customer, Courier, Branch Manager, Admin)
 - [x] Shipment status workflow with business rules
 - [ ] Pagination, filtering and sorting
