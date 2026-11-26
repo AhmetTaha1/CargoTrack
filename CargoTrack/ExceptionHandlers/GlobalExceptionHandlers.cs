@@ -20,6 +20,7 @@ public class GlobalExceptionHandler : IExceptionHandler
         {
             NotFoundException=> (StatusCodes.Status404NotFound, "Kargo bulunamadı"),
              ConflictException => (StatusCodes.Status409Conflict, "İşlem yapılamadı"),
+             UnauthorizedException => (StatusCodes.Status401Unauthorized, "Giriş başarısız"), 
             _ => (StatusCodes.Status500InternalServerError, "Beklenmeyen bir hata oluştu")
         };
 

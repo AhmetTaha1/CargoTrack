@@ -10,39 +10,62 @@ public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly ITokenService _tokenService;
 
 
-    public AuthService(IUserRepository userRepository,IPasswordHasher passwordHasher)
+    public AuthService(IUserRepository userRepository, IPasswordHasher passwordHasher, ITokenService tokenService)
     {
-        _passwordHasher=passwordHasher;
-        _userRepository=userRepository;
+        _passwordHasher = passwordHasher;
+        _userRepository = userRepository;
+        _tokenService = tokenService;
     }
 
     public async Task<UserResponse> RegisterAsync(RegisterRequest request)
     {
-        var email=request.Email.Trim().ToLowerInvariant();
+        var email = request.Email.Trim().ToLowerInvariant();
 
-        if(await _userRepository.EmailExistsAsync(email))
+        if (await _userRepository.EmailExistsAsync(email))
             throw new ConflictException("Bu e-posta zaten kayıtlı");
 
-    var user = new User
+        var user = new User
+        {
+            Email = email,
+            Role = UserRole.Customer
+        };
+
+        user.PasswordHash = _passwordHasher.Hash(user, request.Password);
+
+
+        _userRepository.Add(user);
+        await _userRepository.SaveChangesAsync();
+
+        return new UserResponse
+        {
+            Id = user.Id,
+            Email = user.Email,
+            Role = user.Role
+        };
+
+    }
+
+    public async Task<LoginResponse> LoginAsync(LoginRequest request)
     {
-        Email = email,
-        Role = UserRole.Customer
-    };
+        var email = request.Email.Trim().ToLowerInvariant();
 
-    user.PasswordHash = _passwordHasher.Hash(user, request.Password);
+        var user = await _userRepository.GetByEmailAsync(email);
 
-    
-    _userRepository.Add(user);
-    await _userRepository.SaveChangesAsync();
+        if (user is null || !_passwordHasher.Verify(user, request.Password))
+            throw new UnauthorizedException("E-posta veya şifre hatalı");
 
-    return new UserResponse
-    {
-        Id = user.Id,
-        Email = user.Email,
-        Role = user.Role
-    };
+        return new LoginResponse {Token=_tokenService.CreateToken(user)};
+
+
+
+
+
+
+
+
 
     }
 
